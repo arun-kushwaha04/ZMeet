@@ -3,12 +3,14 @@ import {
  Header,
  Segment,
  Grid,
- List,
+ Message,
  Button,
  Icon,
  Input,
  Divider,
+ Label,
 } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 // import Video from './components/video';
 import Layout from './Layout';
@@ -19,7 +21,8 @@ const Container = styled.div`
  display: flex;
  align-items: center;
  .ui.attached.header,
- .ui.attached.segment {
+ .ui.attached.segment,
+ .ui.message {
   background-color: transparent;
  }
 `;
@@ -29,7 +32,7 @@ function App() {
   <Layout>
    <Container text>
     <Grid columns={2} relaxed='very' stackable doubling>
-     <Grid.Column>
+     <Grid.Column width={8}>
       <Grid.Row>
        <Header as='h2' attached='top'>
         ZMeet
@@ -42,43 +45,42 @@ function App() {
       </Grid.Row>
       <Divider hidden />
       <Grid.Row>
-       <Grid columns={3} textAlign='center'>
+       <Grid columns={3}>
         <Grid.Column>
-         <Button icon fluid labelPosition='left' color='blue' wid>
+         <Button icon fluid labelPosition='left' color='blue'>
           <Icon name='video' />
           Create A Room
          </Button>
         </Grid.Column>
-        <Grid.Column width={1} textAlign='center' verticalAlign='middle'>
+        <Grid.Column width={1} verticalAlign='middle'>
          OR
         </Grid.Column>
         <Grid.Column>
-         <Input
-          icon='users'
-          iconPosition='left'
-          placeholder='Enter a code or link'
-         />
+         <Input placeholder='Enter a code or link' labelPosition='right'>
+          <Label basic>
+           <Icon name='users' />
+          </Label>
+          <input />
+          <Link to='/:dfasf-asfas'>
+           <Button type='submit'>Join</Button>
+          </Link>
+         </Input>
         </Grid.Column>
        </Grid>
       </Grid.Row>
      </Grid.Column>
-     <Grid.Column>
-      <List bulleted>
-       <List.Item>
-        <Header size='medium'>Get a link that you can share</Header>
-       </List.Item>
-       <List.Item>
-        <Header size='medium'>Redueced video/audio latency</Header>
-       </List.Item>
-       <List.Item>
-        <Header size='medium'>
+     <Grid.Column width={8}>
+      <Message>
+       <Message.Header>ZMeet Features</Message.Header>
+       <Message.List>
+        <Message.Item>Get a link that you can share</Message.Item>
+        <Message.Item>Redueced video/audio latency</Message.Item>
+        <Message.Item>
          Peer to peer communication, no server involved
-        </Header>
-       </List.Item>
-       <List.Item>
-        <Header size='medium'>In call chat communication</Header>
-       </List.Item>
-      </List>
+        </Message.Item>
+        <Message.Item>In call chat communication</Message.Item>
+       </Message.List>
+      </Message>
      </Grid.Column>
     </Grid>
    </Container>
