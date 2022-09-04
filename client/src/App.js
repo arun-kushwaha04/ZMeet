@@ -1,3 +1,4 @@
+import React from 'react';
 import './App.css';
 import {
  Header,
@@ -10,9 +11,8 @@ import {
  Divider,
  Label,
 } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-// import Video from './components/video';
 import Layout from './Layout';
 
 const Container = styled.div`
@@ -28,6 +28,16 @@ const Container = styled.div`
 `;
 
 function App() {
+ const navigate = useNavigate();
+
+ React.useEffect(() => {
+  const token = localStorage.getItem('userToken');
+  console.log(token);
+  if (token !== 'undefined' && token) {
+  } else {
+   navigate('/account', { replace: true });
+  }
+ }, [navigate]);
  return (
   <Layout>
    <Container text>
@@ -55,16 +65,23 @@ function App() {
         <Grid.Column width={1} verticalAlign='middle'>
          OR
         </Grid.Column>
-        <Grid.Column>
-         <Input placeholder='Enter a code or link' labelPosition='right'>
+        <Grid.Column textAlign='center'>
+         <Input placeholder='Enter a code or link' labelPosition='right' action>
           <Label basic>
            <Icon name='users' />
           </Label>
           <input />
-          <Link to='/:dfasf-asfas'>
-           <Button type='submit'>Join</Button>
-          </Link>
+          <Button primary>
+           <Link to='/:dfasf-asfas'>Join</Link>
+          </Button>
+          {/* <Button>Join</Button>
+          <Select compact defaultValue='articles' /> */}
          </Input>
+         {/* <Input type='text' placeholder='Search...' action>
+          <input />
+          <Select compact defaultValue='articles' />
+          <Button type='submit'>Search</Button>
+         </Input> */}
         </Grid.Column>
        </Grid>
       </Grid.Row>

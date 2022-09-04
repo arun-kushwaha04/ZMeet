@@ -23,7 +23,7 @@ const Container = styled.div`
 `;
 
 export default function Meetpage() {
- const [isChatsVisible, setChatVisiblity] = React.useState(true);
+ const [isChatsVisible, setChatVisiblity] = React.useState(false);
  return (
   <Layout>
    <Container>

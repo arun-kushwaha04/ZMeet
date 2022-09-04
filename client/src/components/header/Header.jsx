@@ -4,17 +4,17 @@ import { Link } from 'react-router-dom';
 import { Menu } from 'semantic-ui-react';
 
 const Linkdiv = styled.div`
-  text-decoration: none;
+ text-decoration: none;
+ color: white;
+ cursor: pointer;
+ margin: auto 1rem;
+ a {
   color: white;
-  cursor: pointer;  
-  margin:auto 1rem;
-  a{
-    color:white;
-    :hover{
-      color:blue;
-      text-decoration: underline;
-    }
+  :hover {
+   color: blue;
+   text-decoration: underline;
   }
+ }
 `;
 
 export default function Header() {
@@ -31,7 +31,9 @@ export default function Header() {
     </Linkdiv> */}
     <Linkdiv>
      <Link to='/'>
-      <p>Hello, Arun Singh Kushwaha</p>
+      <p style={{ color: 'white' }}>
+       Hello, {localStorage.getItem('username')}
+      </p>
      </Link>
     </Linkdiv>
    </Menu.Menu>

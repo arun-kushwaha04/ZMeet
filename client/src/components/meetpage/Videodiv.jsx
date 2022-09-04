@@ -1,43 +1,122 @@
-import React from 'react';
-import {
- Checkbox,
- Divider,
- Header,
- Segment,
- Sidebar,
- Reveal,
- Icon,
-} from 'semantic-ui-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { Checkbox, Segment, Icon, Grid } from 'semantic-ui-react';
 import styled from 'styled-components';
+import {
+ changeAudioStatus,
+ changeVideoStatus,
+ initializePeerConnection,
+ initializePeersEvents,
+ initializeSocketEvents,
+ reInitializeStream,
+} from './peerService';
+
+import './video.css';
 
 export default function Videodiv({ visible, setVisiblity }) {
+ const usersVideo = useRef();
+ let peer = initializePeerConnection();
+ const [userid, setUserId] = useState('');
+ const [videoStatus, setVideoStatus] = useState(true);
+ const [audioStatus, setAudioStatus] = useState(false);
+
+ useEffect(() => {
+  if (!videoStatus && !audioStatus) {
+   usersVideo.current.srcObject = null;
+  } else {
+   navigator.mediaDevices
+    .getUserMedia({ video: videoStatus, audio: audioStatus })
+    .then((stream) => {
+     usersVideo.current.srcObject = stream;
+    });
+  }
+  if (userid) reInitializeStream(videoStatus, audioStatus);
+ }, [audioStatus, userid, videoStatus]);
+
+ useEffect(() => {
+  // socket.on('meet-url', (data) => {
+  //  console.log(data);
+  // });
+  if (userid.length === 0) {
+   initializePeersEvents(peer, setUserId, videoStatus, audioStatus);
+   initializeSocketEvents();
+  }
+ }, [userid, peer, videoStatus, audioStatus]);
+
  return (
   <Maindiv>
    <Segmentdiv>
-    <Sidebar.Pusher>
-     <Segment basic>
-      <Header as='h3'>Application Content</Header>
-      <Divider vertical />
-      <Checkbox
-       checked={visible}
-       label={{ children: <code>Show Chats</code> }}
-       onChange={(e, data) => setVisiblity(data.checked)}
-      />
-     </Segment>
-    </Sidebar.Pusher>
+    <Segment basic>
+     <Grid
+      className='randomvideogrid'
+      columns={3}
+      verticalAlign='middle'
+      centered
+      container
+     >
+      <Grid.Column>
+       <Supervideodiv>
+        <Video ref={usersVideo} playsInline autoPlay muted />
+        <h4>{userid}</h4>
+       </Supervideodiv>
+      </Grid.Column>
+      {/* {peers.map((obj) => {
+       console.log(obj);
+       return (
+        <Grid.Column>
+         <Supervideodiv>
+          <Video playsInline autoPlay muted src={new MediaSource(obj.stream)} />
+          <h4>{obj.userId}</h4>
+         </Supervideodiv>
+        </Grid.Column>
+       );
+      })} */}
+     </Grid>
+    </Segment>
    </Segmentdiv>
+
    <Animateddiv>
-    <Reveal animated='move down'>
-     <Reveal.Content visible style={{ width: '100%' }}>
-      <Div />
-     </Reveal.Content>
-     <Reveal.Content hidden>
-      <Controldiv>
-       <Icon circular inverted color='green' name='video' size='large' />
-       <Icon circular inverted color='green' name='unmute' size='large' />
-      </Controldiv>
-     </Reveal.Content>
-    </Reveal>
+    <Controldiv>
+     {videoStatus ? (
+      <Icon
+       circular
+       inverted
+       color='green'
+       name='video'
+       size='large'
+       onClick={() => changeVideoStatus(setVideoStatus)}
+      />
+     ) : (
+      <Icon
+       circular
+       name='video'
+       size='large'
+       onClick={() => changeVideoStatus(setVideoStatus)}
+      />
+     )}
+
+     {audioStatus ? (
+      <Icon
+       circular
+       inverted
+       color='green'
+       name='unmute'
+       size='large'
+       onClick={() => changeAudioStatus(setAudioStatus)}
+      />
+     ) : (
+      <Icon
+       circular
+       name='unmute'
+       size='large'
+       onClick={() => changeAudioStatus(setAudioStatus)}
+      />
+     )}
+     {/* <Checkbox
+      checked={visible}
+      label={{ children: <code>Show Chats</code> }}
+      onChange={(e, data) => setVisiblity(data.checked)}
+     /> */}
+    </Controldiv>
    </Animateddiv>
   </Maindiv>
  );
@@ -49,6 +128,9 @@ const Maindiv = styled.div`
 
 const Segmentdiv = styled.div`
  height: 100%;
+ .ui.basic.segment {
+  height: 90%;
+ }
 `;
 
 const Animateddiv = styled.div`
@@ -60,11 +142,28 @@ const Animateddiv = styled.div`
  }
 `;
 
-const Div = styled.div`
- background-color: #fceefc;
- height: 5rem;
+const Supervideodiv = styled.div`
+ position: relative;
+ background-color: #838282;
+ :hover {
+  h4 {
+   display: block;
+  }
+ }
+ h4 {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  top: 50%;
+  left: 50%;
+  display: none;
+  transform: translate(-50%, -150%);
+ }
+`;
+
+const Video = styled.video`
  width: 100%;
- cursor: pointer;
+ height: auto;
 `;
 
 const Controldiv = styled.div`
