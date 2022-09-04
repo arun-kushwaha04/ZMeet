@@ -1,9 +1,10 @@
 import { Peer } from 'peerjs';
 import socket from '../../socket.config';
+import { BACKEND_URL } from '../../urls';
 
 const initializePeerConnection = () => {
  return new Peer(undefined, {
-  host: '192.168.64.110',
+  host: BACKEND_URL,
   port: 8000,
   path: '/webRTC/myapp',
  });

@@ -43,6 +43,7 @@ app.get('/', (_, res) => {
   payload: null,
   message: `Server up and running on port ${port}`,
  });
+ return;
 });
 
 app.post('/getToken', (req, res) => {
@@ -59,23 +60,74 @@ app.post('/getToken', (req, res) => {
   payload: token,
   message: 'Logged In Successfully',
  });
+ return;
 });
 
 app.post('/verifyToken', (req, res) => {
- const { token } = req.body();
+ const { token } = req.body;
 
  jwt.verify(token, process.env.SECRET_KEY, (err, result) => {
   if (err) {
+   console.log(err);
    res.status(400).json({
     status: 400,
     payload: token,
     message: 'Invalid Token',
    });
+   return;
   }
   res.status(200).json({
    status: 200,
    payload: token,
    message: 'Valid Token',
+  });
+  return;
+ });
+});
+
+app.post('/getMeetUrl', (req, res) => {
+ const { username, timestamp } = req.body;
+ const token = jwt.sign(
+  {
+   username,
+   timestamp,
+  },
+  process.env.SECRET_KEY,
+  { expiresIn: '100m' },
+ );
+ res.status(200).json({
+  status: 200,
+  payload: `${username}-${token}`,
+  message: 'Meet Url Generated',
+ });
+ return;
+});
+
+app.post('/verifyMeetUrl', (req, res) => {
+ //username-jwttoken
+ const { meetUrl } = req.body;
+ const [username, token] = meetUrl.split('-');
+ jwt.verify(token, process.env.SECRET_KEY, (err, result) => {
+  if (err) {
+   res.status(400).json({
+    status: 400,
+    payload: null,
+    message: 'Invalid meet url',
+   });
+   return;
+  }
+  if (result && result.username == username) {
+   res.status(200).json({
+    status: 200,
+    payload: null,
+    message: 'Valid url',
+   });
+   return;
+  }
+  res.status(400).json({
+   status: 400,
+   payload: null,
+   message: 'Invalid Token',
   });
  });
 });

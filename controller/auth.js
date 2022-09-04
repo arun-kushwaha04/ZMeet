@@ -12,6 +12,7 @@ exports.register = async (req, res) => {
    payload: null,
    message: 'User Succesfully added to database',
   });
+  return;
  } catch (error) {
   res.status(500).json({
    status: 500,
@@ -19,6 +20,7 @@ exports.register = async (req, res) => {
    message:
     'Failed to add user to database, Potential reason could be - username already exists',
   });
+  return;
  }
 };
 
@@ -47,12 +49,14 @@ exports.login = async (req, res) => {
     payload: data,
     message: 'Logged In Successfully',
    });
+   return;
   } else {
    res.status(400).json({
     status: 400,
     payload: null,
     message: 'Invalid Credentilas',
    });
+   return;
   }
  });
 };

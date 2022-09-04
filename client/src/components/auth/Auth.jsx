@@ -186,9 +186,8 @@ const getToken = async (username) => {
 
 function Login() {
  const navigate = useNavigate();
- const onSuccess = (res) => {
-  const token = getToken(res.profileObj.name);
-  // alert(token);
+ const onSuccess = async (res) => {
+  const token = await getToken(res.profileObj.name);
   localStorage.setItem('userToken', token);
   localStorage.setItem('username', res.profileObj.name);
   navigate('/', { replace: true });
