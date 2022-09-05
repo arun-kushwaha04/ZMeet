@@ -146,6 +146,13 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
    socket.to(roomID).emit('user-disconnected', userID);
   });
+
+  socket.on('video-changed-client', (userID, status) => {
+   socket.to(roomID).emit('video-changed', userID, status);
+  });
+  socket.on('audio-changed-client', (userID, status) => {
+   socket.to(roomID).emit('audio-changed', userID, status);
+  });
  });
 
  // socket.on('currentUserStream', (stream) => {

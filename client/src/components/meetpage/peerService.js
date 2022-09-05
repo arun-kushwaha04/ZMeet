@@ -10,6 +10,8 @@ const initializePeerConnection = () => {
  });
 };
 const peers = {};
+let roomID;
+let userID;
 
 let globalStream;
 
@@ -19,10 +21,12 @@ const initializePeersEvents = (
  setUserId,
  videoStatus,
  audioStatus,
+ updateParticipant,
 ) => {
  myPeer.on('open', async (id) => {
   setUserId(id);
-  const roomID = meetUrl;
+  userID = id;
+  roomID = meetUrl;
   const userData = {
    userID: id,
    roomID,
@@ -31,7 +35,7 @@ const initializePeersEvents = (
   console.log('peers established and joined room', userData);
   socket.emit('join-room', userData);
   globalStream = await getVideoAndAudioStream(videoStatus, audioStatus);
-  setNavigatorToStream(myPeer, id, peers, videoStatus, audioStatus);
+  setNavigatorToStream(myPeer, id, peers, updateParticipant);
  });
  myPeer.on('error', (err) => {
   console.log('peer connection error', err);
@@ -39,21 +43,46 @@ const initializePeersEvents = (
  });
 };
 
-const initializeSocketEvents = () => {
+const initializeSocketEvents = (updateParticipant) => {
  console.log('intalizing socket events');
  socket.on('connect', () => {
   console.log('socket connected');
  });
+ socket.on('video-changed', (userID, status) => {
+  console.log('video status changed for ', userID, status);
+  updateParticipant((data) => ({
+   ...data,
+   [userID]: { ...data[userID], videoStatus: status },
+  }));
+ });
+ socket.on('audio-changed', (userID, status) => {
+  console.log('audio status changed for ', userID);
+  updateParticipant((data) => ({
+   ...data,
+   [userID]: { ...data[userID], audioStatus: status },
+  }));
+ });
  socket.on('user-disconnected', (userID) => {
   console.log('user disconnected-- closing peers', userID);
   peers[userID] && peers[userID].close();
+  removeParticipant(updateParticipant, userID);
  });
  socket.on('disconnect', () => {
   console.log('socket disconnected --');
  });
 };
 
-const setPeersListeners = (myPeer, peers, videoStatus, audioStatus) => {
+const removeParticipant = (updateParticipant, targetUserID) => {
+ updateParticipant((data) => {
+  let newObj = {};
+  Object.keys(data).forEach((key) => {
+   if (key !== targetUserID) newObj[key] = data[key];
+  });
+  return newObj;
+ });
+};
+
+const setPeersListeners = (myPeer, peers, updateParticipant) => {
  myPeer.on('call', (call) => {
   call.answer(globalStream);
   const id = call.metadata.id;
@@ -64,26 +93,46 @@ const setPeersListeners = (myPeer, peers, videoStatus, audioStatus) => {
    if (!div) {
     addNewUsersVideo(id, username, userVideoStream);
    }
+   const userData = {
+    userID: id,
+    username: username,
+    videoStatus: true,
+    audioStatus: true,
+   };
+   updateParticipant((data) => {
+    return { ...data, [id]: userData };
+   });
   });
   call.on('close', () => {
    console.log('closing peers listeners', call.metadata.id);
    const div = document.getElementById(id);
    div.remove();
    delete peers[id];
+   removeParticipant(updateParticipant, id);
   });
   call.on('error', () => {
    console.log('peer error ------');
    const div = document.getElementById(id);
    div.remove();
    delete peers[id];
+   removeParticipant(updateParticipant, id);
   });
   peers[id] = call;
  });
 };
 
-const newUserConnection = (peer, myuserID, peers) => {
+const newUserConnection = (peer, myuserID, peers, updateParticipant) => {
  socket.on('user-connected', async (userID, othersUsername) => {
   console.log('New User Connected', userID, othersUsername);
+  const userData = {
+   userID,
+   username: othersUsername,
+   videoStatus: true,
+   audioStatus: true,
+  };
+  updateParticipant((data) => {
+   return { ...data, [userID]: userData };
+  });
   setTimeout(
    connectToNewUser,
    2000,
@@ -92,6 +141,7 @@ const newUserConnection = (peer, myuserID, peers) => {
    myuserID,
    peers,
    othersUsername,
+   updateParticipant,
   );
   // connectToNewUser(peer, userID, myuserID, updatePeers);
  });
@@ -103,6 +153,7 @@ const connectToNewUser = async (
  myuserID,
  peers,
  othersUsername,
+ updateParticipant,
 ) => {
  console.log('stream ka check kaar raha hu', globalStream);
  const call = myPeer.call(othersuserID, globalStream, {
@@ -119,12 +170,14 @@ const connectToNewUser = async (
   const div = document.getElementById(othersuserID);
   div.remove();
   delete peers[othersuserID];
+  removeParticipant(updateParticipant, othersuserID);
  });
  call.on('error', () => {
   console.log('peer error ------');
   const div = document.getElementById(othersuserID);
   div.remove();
   delete peers[othersuserID];
+  removeParticipant(updateParticipant, othersuserID);
  });
  peers[othersuserID] = call;
 };
@@ -219,35 +272,12 @@ const getVideoAndAudioStream = (videoStatus, audioStatus) => {
  });
 };
 
-const setNavigatorToStream = async (myPeer, id, peers) => {
- setPeersListeners(myPeer, peers);
- newUserConnection(myPeer, id, peers);
-};
-
-const replaceStream = (mediaStream) => {
- Object.values(peers).map((peer) => {
-  peer.peerConnection?.getSenders().map((sender) => {
-   console.log(sender, sender.track.kind);
-   if (sender.track.kind === 'audio') {
-    if (mediaStream.getAudioTracks().length > 0) {
-     sender.replaceTrack(mediaStream.getAudioTracks()[0]);
-    }
-   }
-   if (sender.track.kind === 'video') {
-    if (mediaStream.getVideoTracks().length > 0) {
-     sender.replaceTrack(mediaStream.getVideoTracks()[0]);
-    }
-   }
-   //  sender.replaceTrack(new MediaStream(mediaStream));
-  });
- });
+const setNavigatorToStream = async (myPeer, id, peers, updateParticipant) => {
+ setPeersListeners(myPeer, peers, updateParticipant);
+ newUserConnection(myPeer, id, peers, updateParticipant);
 };
 
 const reInitializeStream = async (videoStatus, audioStatus) => {
- // console.log('Reintalizing the stream');
- // await getVideoAndAudioStream(videoStatus, audioStatus);
- // replaceStream(globalStream);
-
  if (globalStream) {
   globalStream.getAudioTracks() &&
    globalStream
@@ -260,12 +290,19 @@ const reInitializeStream = async (videoStatus, audioStatus) => {
  }
 };
 
-const changeVideoStatus = (setStatus) => {
- setStatus((data) => !data);
+const changeVideoStatus = (setStatus, videoStatus) => {
+ setStatus((data) => {
+  // socket.to(roomID).emit('video-changed', userID, !data);
+  return !data;
+ });
+ socket.emit('video-changed-client', userID, !videoStatus);
 };
 
-const changeAudioStatus = (setStatus) => {
- setStatus((data) => !data);
+const changeAudioStatus = (setStatus, audioStatus) => {
+ setStatus((data) => {
+  return !data;
+ });
+ socket.emit('audio-changed-client', userID, !audioStatus);
 };
 
 export {

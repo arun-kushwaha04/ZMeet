@@ -28,6 +28,9 @@ export default function Meetpage() {
  const [isChatsVisible, setChatVisiblity] = useState(false);
  const [isValid, setValidity] = useState(false);
  const [loading, setLoading] = useState(true);
+
+ const [videoStatus, setVideoStatus] = useState(true);
+ const [audioStatus, setAudioStatus] = useState(true);
  let param = useParams();
  const meetUrl = param.meetUrl.slice(1);
 
@@ -57,6 +60,7 @@ export default function Meetpage() {
   verifyMeetUrl();
  }, [meetUrl]);
 
+ const [participant, updateParticipant] = useState({});
  return (
   <Layout>
    <Container>
@@ -76,7 +80,11 @@ export default function Meetpage() {
      </Header>
     ) : (
      <>
-      <Participantsdiv />
+      <Participantsdiv
+       participant={participant}
+       videoStatus={videoStatus}
+       audioStatus={audioStatus}
+      />
       <Grid padded columns={1}>
        <Grid.Column>
         <Sidebar.Pushable as={Segment}>
@@ -85,6 +93,11 @@ export default function Meetpage() {
           visible={isChatsVisible}
           setVisiblity={setChatVisiblity}
           meetUrl={meetUrl}
+          updateParticipant={updateParticipant}
+          videoStatus={videoStatus}
+          audioStatus={audioStatus}
+          setVideoStatus={setVideoStatus}
+          setAudioStatus={setAudioStatus}
          />
         </Sidebar.Pushable>
        </Grid.Column>

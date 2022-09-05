@@ -12,12 +12,19 @@ import {
 
 import './video.css';
 
-export default function Videodiv({ visible, setVisiblity, meetUrl }) {
+export default function Videodiv({
+ visible,
+ setVisiblity,
+ meetUrl,
+ updateParticipant,
+ videoStatus,
+ audioStatus,
+ setVideoStatus,
+ setAudioStatus,
+}) {
  const usersVideo = useRef();
  let peer = initializePeerConnection();
  const [userid, setUserId] = useState('');
- const [videoStatus, setVideoStatus] = useState(true);
- const [audioStatus, setAudioStatus] = useState(true);
 
  useEffect(() => {
   if (!videoStatus && !audioStatus) {
@@ -34,10 +41,17 @@ export default function Videodiv({ visible, setVisiblity, meetUrl }) {
 
  useEffect(() => {
   if (userid.length === 0) {
-   initializePeersEvents(peer, meetUrl, setUserId, videoStatus, audioStatus);
-   initializeSocketEvents();
+   initializePeersEvents(
+    peer,
+    meetUrl,
+    setUserId,
+    videoStatus,
+    audioStatus,
+    updateParticipant,
+   );
+   initializeSocketEvents(updateParticipant);
   }
- }, [userid, peer, videoStatus, audioStatus]);
+ }, [userid, peer, videoStatus, audioStatus, meetUrl, updateParticipant]);
 
  return (
   <Maindiv>
@@ -80,14 +94,14 @@ export default function Videodiv({ visible, setVisiblity, meetUrl }) {
        color='green'
        name='video'
        size='large'
-       onClick={() => changeVideoStatus(setVideoStatus)}
+       onClick={() => changeVideoStatus(setVideoStatus, videoStatus)}
       />
      ) : (
       <Icon
        circular
        name='video'
        size='large'
-       onClick={() => changeVideoStatus(setVideoStatus)}
+       onClick={() => changeVideoStatus(setVideoStatus, videoStatus)}
       />
      )}
 
@@ -98,14 +112,14 @@ export default function Videodiv({ visible, setVisiblity, meetUrl }) {
        color='green'
        name='unmute'
        size='large'
-       onClick={() => changeAudioStatus(setAudioStatus)}
+       onClick={() => changeAudioStatus(setAudioStatus, audioStatus)}
       />
      ) : (
       <Icon
        circular
        name='unmute'
        size='large'
-       onClick={() => changeAudioStatus(setAudioStatus)}
+       onClick={() => changeAudioStatus(setAudioStatus, audioStatus)}
       />
      )}
      {/* <Checkbox
