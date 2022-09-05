@@ -38,12 +38,12 @@ const peerServer = ExpressPeerServer(httpServer, {
 
 app.use('/webRTC', peerServer);
 app.use('/auth', authRoute);
+app.use(express.static(path.join(__dirname, '/public')));
 
-app.get('/', (_, res) => {
- app.use(express.static(path.join(process.env.PWD, 'client/build')));
- res.sendFile(path.join(process.env.PWD, 'client/build', 'index.html'));
- return;
-});
+// app.get('/', (_, res) => {
+//  res.sendFile(path.join(process.env.PWD, 'client/build', 'index.html'));
+//  return;
+// });
 
 app.post('/getToken', (req, res) => {
  const { username } = req.body;
