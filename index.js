@@ -40,10 +40,13 @@ app.use('/webRTC', peerServer);
 app.use('/auth', authRoute);
 app.use(express.static(path.join(__dirname, '/public')));
 
-// app.get('/', (_, res) => {
-//  res.sendFile(path.join(process.env.PWD, 'client/build', 'index.html'));
-//  return;
-// });
+app.get('/', (_, res) => {
+ res.status(200).json({
+  status: 200,
+  payload: null,
+  message: `Server Up and running on ${port}`,
+ });
+});
 
 app.post('/getToken', (req, res) => {
  const { username } = req.body;
