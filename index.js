@@ -1,4 +1,5 @@
 require('dotenv').config();
+process.env.PWD = process.cwd();
 const express = require('express');
 const cors = require('cors');
 const { ExpressPeerServer } = require('peer');
@@ -39,8 +40,8 @@ app.use('/webRTC', peerServer);
 app.use('/auth', authRoute);
 
 app.get('/', (_, res) => {
- app.use(express.static(path.join(__dirname, 'client/build')));
- res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+ app.use(express.static(path.join(process.env.PWD, 'client/build')));
+ res.sendFile(path.join(process.env.PWD, 'client/build', 'index.html'));
  return;
 });
 
