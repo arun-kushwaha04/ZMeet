@@ -139,9 +139,9 @@ httpServer.listen(8000, (err) => {
 
 io.on('connection', (socket) => {
  io.to(socket.id).emit('meet-url', uuidV4());
- socket.on('join-room', ({ roomID, userID }) => {
+ socket.on('join-room', ({ roomID, userID, username }) => {
   socket.join(roomID);
-  socket.to(roomID).emit('user-connected', userID);
+  socket.to(roomID).emit('user-connected', userID, username);
 
   socket.on('disconnect', () => {
    socket.to(roomID).emit('user-disconnected', userID);

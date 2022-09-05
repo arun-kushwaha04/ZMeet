@@ -8,7 +8,7 @@ export default function Participantsdiv() {
    <Menu.Item>
     <Icon name='mute' />
     <Icon name='video' />
-    Arun
+    You
    </Menu.Item>
    <Menu.Item>
     <Icon name='unmute' />

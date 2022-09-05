@@ -17,7 +17,7 @@ export default function Videodiv({ visible, setVisiblity }) {
  let peer = initializePeerConnection();
  const [userid, setUserId] = useState('');
  const [videoStatus, setVideoStatus] = useState(true);
- const [audioStatus, setAudioStatus] = useState(false);
+ const [audioStatus, setAudioStatus] = useState(true);
 
  useEffect(() => {
   if (!videoStatus && !audioStatus) {
@@ -33,9 +33,6 @@ export default function Videodiv({ visible, setVisiblity }) {
  }, [audioStatus, userid, videoStatus]);
 
  useEffect(() => {
-  // socket.on('meet-url', (data) => {
-  //  console.log(data);
-  // });
   if (userid.length === 0) {
    initializePeersEvents(peer, setUserId, videoStatus, audioStatus);
    initializeSocketEvents();
@@ -56,7 +53,7 @@ export default function Videodiv({ visible, setVisiblity }) {
       <Grid.Column>
        <Supervideodiv>
         <Video ref={usersVideo} playsInline autoPlay muted />
-        <h4>{userid}</h4>
+        <h4>You</h4>
        </Supervideodiv>
       </Grid.Column>
       {/* {peers.map((obj) => {
