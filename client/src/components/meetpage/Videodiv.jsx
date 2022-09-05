@@ -1,9 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Checkbox, Segment, Icon, Grid } from 'semantic-ui-react';
+import { Modal, Segment, Icon, Grid, Button, Header } from 'semantic-ui-react';
 import styled from 'styled-components';
 import {
  changeAudioStatus,
  changeVideoStatus,
+ closePeerConnection,
  initializePeerConnection,
  initializePeersEvents,
  initializeSocketEvents,
@@ -25,6 +26,7 @@ export default function Videodiv({
  const usersVideo = useRef();
  let peer = initializePeerConnection();
  const [userid, setUserId] = useState('');
+ const [open, setOpen] = useState(false);
 
  useEffect(() => {
   if (!videoStatus && !audioStatus) {
@@ -104,6 +106,38 @@ export default function Videodiv({
        onClick={() => changeVideoStatus(setVideoStatus, videoStatus)}
       />
      )}
+     <Modal
+      closeIcon
+      open={open}
+      size='small'
+      trigger={<Icon circular inverted color='red' name='call' size='large' />}
+      onClose={() => setOpen(false)}
+      onOpen={() => setOpen(true)}
+     >
+      <Header icon='close' content='Leave the meet' />
+      <Modal.Content>
+       <p>Do you really want to leave the room ?</p>
+      </Modal.Content>
+      <Modal.Actions>
+       <Button
+        color='red'
+        onClick={() => {
+         setOpen(false);
+        }}
+       >
+        <Icon name='remove' /> No
+       </Button>
+       <Button
+        color='green'
+        onClick={() => {
+         setOpen(false);
+         closePeerConnection();
+        }}
+       >
+        <Icon name='checkmark' /> Yes
+       </Button>
+      </Modal.Actions>
+     </Modal>
 
      {audioStatus ? (
       <Icon

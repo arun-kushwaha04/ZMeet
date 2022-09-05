@@ -23,6 +23,7 @@ const initializePeersEvents = (
  audioStatus,
  updateParticipant,
 ) => {
+ console.log('Trying to get peer id', meetUrl);
  myPeer.on('open', async (id) => {
   setUserId(id);
   userID = id;
@@ -70,6 +71,14 @@ const initializeSocketEvents = (updateParticipant) => {
  socket.on('disconnect', () => {
   console.log('socket disconnected --');
  });
+};
+
+const closePeerConnection = () => {
+ Object.values(peers).forEach((call) => {
+  call.close();
+ });
+ window.open('/', '_self');
+ window.close();
 };
 
 const removeParticipant = (updateParticipant, targetUserID) => {
@@ -312,4 +321,5 @@ export {
  changeAudioStatus,
  changeVideoStatus,
  reInitializeStream,
+ closePeerConnection,
 };

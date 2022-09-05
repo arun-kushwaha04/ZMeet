@@ -87,6 +87,7 @@ app.post('/verifyToken', (req, res) => {
 
 app.post('/getMeetUrl', (req, res) => {
  const { username, timestamp } = req.body;
+ console.log(username, timestamp);
  const token = jwt.sign(
   {
    username,
@@ -107,8 +108,10 @@ app.post('/verifyMeetUrl', (req, res) => {
  //username-jwttoken
  const { meetUrl } = req.body;
  const [username, token] = meetUrl.split('-');
+ //  console.log(process.env.SECRET_KEY);
  jwt.verify(token, process.env.SECRET_KEY, (err, result) => {
   if (err) {
+   console.log(err);
    res.status(400).json({
     status: 400,
     payload: null,
