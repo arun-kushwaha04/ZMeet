@@ -6,6 +6,7 @@ const { v4: uuidV4 } = require('uuid');
 const authRoute = require('./routes/auth.js');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const path = require('path');
 
 const app = express();
 const httpServer = require('http').createServer(app);
@@ -38,11 +39,8 @@ app.use('/webRTC', peerServer);
 app.use('/auth', authRoute);
 
 app.get('/', (_, res) => {
- res.status(200).json({
-  status: 200,
-  payload: null,
-  message: `Server up and running on port ${port}`,
- });
+ app.use(express.static(path.join(__dirname, 'client/build')));
+ res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
  return;
 });
 
