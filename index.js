@@ -127,7 +127,7 @@ app.post('/verifyMeetUrl', (req, res) => {
   res.status(400).json({
    status: 400,
    payload: null,
-   message: 'Invalid Token',
+   message: 'Invalid meet url',
   });
  });
 });

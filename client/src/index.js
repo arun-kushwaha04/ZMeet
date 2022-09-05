@@ -13,7 +13,7 @@ render(
  <BrowserRouter>
   <Routes>
    <Route path='/' element={<App />} />
-   <Route path=':meetId' element={<Meetpage />} />
+   <Route path=':meetUrl' element={<Meetpage />} />
    <Route path='/account' element={<Auth />} />
    {/* <Route path="teams" element={<Teams />}>
           <Route path=":teamId" element={<Team />} />

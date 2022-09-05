@@ -12,7 +12,7 @@ import {
 
 import './video.css';
 
-export default function Videodiv({ visible, setVisiblity }) {
+export default function Videodiv({ visible, setVisiblity, meetUrl }) {
  const usersVideo = useRef();
  let peer = initializePeerConnection();
  const [userid, setUserId] = useState('');
@@ -34,7 +34,7 @@ export default function Videodiv({ visible, setVisiblity }) {
 
  useEffect(() => {
   if (userid.length === 0) {
-   initializePeersEvents(peer, setUserId, videoStatus, audioStatus);
+   initializePeersEvents(peer, meetUrl, setUserId, videoStatus, audioStatus);
    initializeSocketEvents();
   }
  }, [userid, peer, videoStatus, audioStatus]);

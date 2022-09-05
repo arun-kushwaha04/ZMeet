@@ -13,10 +13,16 @@ const peers = {};
 
 let globalStream;
 
-const initializePeersEvents = (myPeer, setUserId, videoStatus, audioStatus) => {
+const initializePeersEvents = (
+ myPeer,
+ meetUrl,
+ setUserId,
+ videoStatus,
+ audioStatus,
+) => {
  myPeer.on('open', async (id) => {
   setUserId(id);
-  const roomID = 'Hello';
+  const roomID = meetUrl;
   const userData = {
    userID: id,
    roomID,
