@@ -100,7 +100,7 @@ app.post('/getMeetUrl', (req, res) => {
  );
  res.status(200).json({
   status: 200,
-  payload: `${username}-${token}`,
+  payload: `${username}@-:${token}`,
   message: 'Meet Url Generated',
  });
  return;
@@ -109,8 +109,9 @@ app.post('/getMeetUrl', (req, res) => {
 app.post('/verifyMeetUrl', (req, res) => {
  //username-jwttoken
  const { meetUrl } = req.body;
- const [username, token] = meetUrl.split('-');
+ const [username, token] = meetUrl.split('@-:');
  //  console.log(process.env.SECRET_KEY);
+ console.log(username, token);
  jwt.verify(token, process.env.SECRET_KEY, (err, result) => {
   if (err) {
    console.log(err);
